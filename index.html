@@ -1,25 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Offline Knowledge Hub</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
 </head>
 <body>
   <header>
     <h1>Offline Knowledge Hub</h1>
     <button id="importBtn">Import File</button>
-    <input type="file" id="fileInput" style="display:none;" multiple>
-    <input type="text" id="searchInput" placeholder="Search your files...">
+    <button id="summarizeAllBtn">Summarize All Files</button> <!-- NEW BUTTON -->
+    <input type="file" id="fileInput" style="display:none;" multiple />
+    <input type="text" id="searchInput" placeholder="Search your files..." />
   </header>
 
   <main id="fileList"></main>
 
+  <section id="allSummary" style="padding:10px; border-top:1px solid #ccc; background:#fafafa;"></section> <!-- SUMMARY OUTPUT -->
+
   <!-- Tesseract OCR -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <!-- Xenova Transformers (for summarization & ASR in-browser) -->
+  <!-- Transformers summarizer and transcription -->
   <script type="module" src="summarizer.js"></script>
   <script type="module" src="transcription.js"></script>
 
