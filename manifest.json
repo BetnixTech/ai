@@ -1,0 +1,9 @@
+{
+  "name": "Offline Knowledge Hub",
+  "short_name": "KnowledgeHub",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#222",
+  "theme_color": "#222",
+  "icons": []
+}
