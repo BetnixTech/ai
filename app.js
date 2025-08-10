@@ -15,7 +15,6 @@ window.addEventListener("load", async () => {
       if (file.type.startsWith("image/")) {
         textContent = await runOCR(file);
       } else if (file.type.startsWith("audio/") || file.type.startsWith("video/")) {
-        // Store the file blob URL reference and attempt transcription
         transcript = await transcribeAudioFile(file).catch(err => {
           console.warn("transcription failed", err);
           return '';
@@ -27,7 +26,6 @@ window.addEventListener("load", async () => {
         textContent = "[File stored, no text extraction yet]";
       }
 
-      // Summarize if we have textual content
       let summary = "";
       if (textContent && textContent.length > 50) {
         summary = await summarizeText(textContent).catch(err => {
@@ -49,7 +47,7 @@ window.addEventListener("load", async () => {
         text: textContent,
         summary: summary,
         transcript: transcript,
-        blob: blob // storing as Blob in IndexedDB
+        blob: blob
       };
       await saveFile(stored);
     }
@@ -57,6 +55,19 @@ window.addEventListener("load", async () => {
   });
 
   document.getElementById("searchInput").addEventListener("input", loadFiles);
+
+  // NEW: Summarize all files button handler
+  document.getElementById("summarizeAllBtn").addEventListener("click", async () => {
+    const files = await getFiles();
+    const combinedText = files.map(f => f.text || "").join("\n\n");
+    if (combinedText.length < 50) {
+      alert("Not enough text to summarize!");
+      return;
+    }
+    const summary = await summarizeText(combinedText);
+    const summaryDiv = document.getElementById("allSummary");
+    summaryDiv.innerHTML = "<h2>Summary of All Files</h2><p>" + summary + "</p>";
+  });
 });
 
 async function loadFiles() {
@@ -66,11 +77,17 @@ async function loadFiles() {
   list.innerHTML = "";
   files
     .filter(f => {
-      const name = (f.name || '').toLowerCase();
-      const text = (f.text || '').toLowerCase();
-      const summary = (f.summary || '').toLowerCase();
-      const transcript = (f.transcript || '').toLowerCase();
-      return !query || name.includes(query) || text.includes(query) || summary.includes(query) || transcript.includes(query);
+      const name = (f.name || "").toLowerCase();
+      const text = (f.text || "").toLowerCase();
+      const summary = (f.summary || "").toLowerCase();
+      const transcript = (f.transcript || "").toLowerCase();
+      return (
+        !query ||
+        name.includes(query) ||
+        text.includes(query) ||
+        summary.includes(query) ||
+        transcript.includes(query)
+      );
     })
     .forEach(f => {
       const div = document.createElement("div");
@@ -79,15 +96,15 @@ async function loadFiles() {
       div.innerHTML = `<strong>${f.name}</strong> <span class="small">(${when})</span><br>
         <em>Summary:</em> ${f.summary || '<span class="small">No summary</span>'}<br>
         <em>Transcript:</em> ${f.transcript || '<span class="small">No transcript</span>'}<br>
-        <small>${(f.text || '').substring(0, 200)}${(f.text && f.text.length>200)?'...':''}</small>`;
+        <small>${(f.text || "").substring(0, 200)}${(f.text && f.text.length > 200 ? "..." : "")}</small>`;
       list.appendChild(div);
     });
 }
 
 // Service worker registration
 async function registerServiceWorker() {
-  if ('serviceWorker' in navigator) {
-    await navigator.serviceWorker.register('service-worker.js');
+  if ("serviceWorker" in navigator) {
+    await navigator.serviceWorker.register("service-worker.js");
     console.log("Service worker registered");
   }
 }
